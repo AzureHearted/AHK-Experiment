@@ -16,7 +16,7 @@ class ControlAlwaysOnTop {
 
   __New(targetId) {
     this.tid := targetId
-    this.myGui := Gui('+ToolWindow -Caption ' '+Owner' parentId)
+    this.myGui := Gui('+ToolWindow -Caption ' '+Owner' this.tid)
     this.myGui.MarginX := 0
     this.myGui.MarginY := 0
 
@@ -51,11 +51,13 @@ class ControlAlwaysOnTop {
   }
 
   Hook(*) {
-    if (!WinExist('ahk_id' this.tid) || this.removeFlag)
+    ; * 停止条件：目标窗口不存在 | 目标窗口没有置顶 | removeFlag == true
+    if (!WinExist('ahk_id' this.tid) || !IsAlwaysOnTop(this.tid) || this.removeFlag)
     {
       OutputDebug('窗口被关闭了')
       SetTimer(this.timerFun, 0)
-      return false
+      this.Remove()
+      return
     }
     this.GetParentPos(&px, &py, &pw, &ph)
     x := px + pw + this.offsetX
